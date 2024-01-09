@@ -1,40 +1,51 @@
 const DEFAULT_VALUE = '';
 
 let firstNumber = DEFAULT_VALUE;
-let operator = '+';
+let operator = DEFAULT_VALUE;
 let secondNumber = DEFAULT_VALUE;
 let displayValue = DEFAULT_VALUE;
-
-function updateDisplay() {
-    display.innerHTML = displayValue;
-}
+let displayOperation = DEFAULT_VALUE;
 
 function displayScreen(value) {
-    displayValue += value;
-    display.innerHTML = displayValue;
+    displayOperation += value;
+    display.innerHTML = displayOperation;
 }
 
 function deleteNumber() {
-    displayValue = displayValue.slice(0, -1);
-    display.innerHTML = displayValue;
+    displayOperation = displayOperation.slice(0, -1);
+    display.innerHTML = displayOperation;
 }
 
-function clearDisplay() {
-    display.innerHTML = '0'
-    displayValue = DEFAULT_VALUE;
-    firstNumber =DEFAULT_VALUE;
-}
-
-function evaluate(operatorSign) {
-    operator = operatorSign;
-    if (firstNumber == DEFAULT_VALUE) {
-        firstNumber = displayValue;
-        displayValue = DEFAULT_VALUE;
+function updateDisplay(value) {
+    display.innerHTML = value
+    if (value !== "0") {
+        displayOperation = value;
     } else {
-        displayValue = firstNumber;
-        firstNumber = displayValue;
-        updateDisplay();
-        displayValue = DEFAULT_VALUE;
+        displayOperation = DEFAULT_VALUE;
+    }
+    displayValue = value;
+}
+
+function evaluate(equation) {
+    expression = false;
+    for(let i = 0; i < equation.length; i++) {
+        if (!("+-/*".includes(equation[i])) && expression) {
+            secondNumber += equation[i]
+        } 
+        else if (!("+-/*".includes(equation[i]))) {
+            firstNumber += equation[i]
+        } else {
+            expression = true;
+            if (secondNumber !== DEFAULT_VALUE) {
+                operate(operator, firstNumber, secondNumber);
+                firstNumber = displayValue;
+                secondNumber = DEFAULT_VALUE;
+            }
+            operator = equation[i]
+        }
+        if (i === equation.length-1) {
+            operate(operator, firstNumber, secondNumber)
+        }
     }
 }
 //Calculator functionality
@@ -67,54 +78,30 @@ buttonSeven.onclick = () => displayScreen('7');
 buttonEight.onclick = () => displayScreen('8');
 buttonNine.onclick = () => displayScreen('9');
 buttonZero.onclick = () => displayScreen('0');
+buttonAddition.onclick = () => displayScreen('+');
+buttonSubtraction.onclick = () => displayScreen('-');
+buttonMultiplication.onclick = () => displayScreen('*');
+buttonDivision.onclick = () => displayScreen('/');
 
 buttonDelete.onclick = () => deleteNumber();
-buttonClear.onclick = () => clearDisplay();
+buttonClear.onclick = () => updateDisplay("0");
 
-buttonAddition.onclick = () => evaluate('+');
-buttonSubtraction.onclick = () => evaluate('-');
-buttonDivision.onclick = () => evaluate('/');
-buttonMultiplication.onclick = () => evaluate('*');
-buttonEquality.onclick = () => operate(operator, firstNumber, displayValue);
-//Basic Operation Functions
-function addition(num1, num2) {
-    displayValue = parseInt(num1)+parseInt(num2);
-    displayValue = String(displayValue)
-    firstNumber = displayValue
-    updateDisplay();
-}
+buttonEquality.onclick = () => evaluate(displayOperation);
 
-function subtraction(num1, num2) {
-    displayValue =  parseInt(num1)-parseInt(num2);
-    displayValue = String(displayValue)
-    firstNumber = displayValue
-    updateDisplay();
-}
-
-function multiplication(num1, num2) {
-    displayValue =  parseInt(num1)*parseInt(num2);
-    displayValue = String(displayValue)
-    firstNumber = displayValue
-    updateDisplay();
-}
-
-function division(num1, num2) {
-    displayValue =  parseInt(num1)/parseInt(num2);
-    displayValue = String(displayValue)
-    firstNumber = displayValue
-    updateDisplay();
-}
 //Operate Function
 function operate(operator, num1, num2) {
     if(operator === '+') {
-        addition(num1, num2);
+        displayValue = parseInt(num1) + parseInt(num2);
     } else if(operator === '-') {
-        subtraction(num1, num2);
+        displayValue = parseInt(num1) - parseInt(num2);
     } else if(operator === '*') {
-        multiplication(num1, num2);
+        displayValue = parseInt(num1) * parseInt(num2);
     } else if(operator === '/') {
-        division(num1, num2);
-    } else {
-        return TypeError("no operator was choosen")
-    }
+        displayValue = parseInt(num1) / parseInt(num2);
+    } 
+    displayValue = String(displayValue)
+    updateDisplay(displayValue);
+    firstNumber = DEFAULT_VALUE;
+    operator = DEFAULT_VALUE;
+    secondNumber = DEFAULT_VALUE;
 }
